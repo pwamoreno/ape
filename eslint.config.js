@@ -7,4 +7,15 @@ module.exports = defineConfig([
   {
     ignores: ['dist/*'],
   },
+   {
+    // 👇 Add this override
+    files: ['*.cjs', '*.js'],
+    env: {
+      node: true,
+    },
+    // rules: {
+    //   // Allow CommonJS in config files
+    //   'no-undef': 'off', // optional if node env fixes it
+    // },
+  },
 ]);
