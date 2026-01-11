@@ -1,39 +1,47 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const useFetch = <T>(fetchFunction: () => Promise<T>, autoFetch = true) => {
-    const [data, setData] = useState<T | null>(null);
+  const [data, setData] = useState<T | null>(null);
 
-    const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<Error | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<Error | null>(null);
 
-    const fetchData = async () => {
-        try {
-            setLoading(true);
-            setError(null);
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-            const result = await fetchFunction();
-            setData(result);
-        } catch (error) {
-            //@ts-ignore
-            setError(error instanceof Error ? error : new Error("An unknown error occurred"));
-        } finally {
-            setLoading(false);
-        }
-    };
+      const result = await fetchFunction();
+      setData(result);
+    } catch (error) {
+      //@ts-ignore
+      setError(
+        error instanceof Error ? error : new Error("An unknown error occurred")
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchFunction]);
 
-    const reset = () => {
-            setData(null);
-            setError(null);
-            setLoading(false);
-        }
+  //   const reset = () => {
+  //     setData(null);
+  //     setError(null);
+  //     setLoading(false);
+  //   };
 
-        useEffect(() => {
-            if (autoFetch) {
-                fetchData();
-            }
-        }, []);
+  const reset = useCallback(() => {
+    setData(null);
+    setError(null);
+    setLoading(false);
+  }, []);
 
-        return { data, loading, error, refetch: fetchData, reset };
-}
+  useEffect(() => {
+    if (autoFetch) {
+      fetchData();
+    }
+  }, [autoFetch, fetchData]);
+
+  return { data, loading, error, refetch: fetchData, reset };
+};
 
 export default useFetch;
